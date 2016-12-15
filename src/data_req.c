@@ -1,5 +1,18 @@
 #include <data_req.h>
 
+struct string* construct_user_url(char *api_key) {
+	struct string *url = malloc(sizeof(struct string));
+	init_string(url);
+	size_t new_len = strlen(USER_URL) + strlen("?api_key=") + strlen(api_key) + 1;
+	url->ptr = realloc(url->ptr, new_len);
+	strcpy(url->ptr, USER_URL);
+	strcat(url->ptr, "?api_key=");
+	strcat(url->ptr, api_key);
+	strcat(url->ptr, "\0");
+	url->len = new_len;
+	return url;
+}
+
 struct string* get_user(char *api_key) {
 	CURL *curl;
 	CURLcode res;
@@ -8,15 +21,9 @@ struct string* get_user(char *api_key) {
 	struct string *s = malloc(sizeof(struct string));
 	init_string(s);
 	if (curl) {
-		struct string url;
-		init_string(&url);
-		url.ptr = malloc(strlen(USER_URL) + strlen(api_key) + 1);
-		strcpy(url.ptr, USER_URL);
-		strcat(url.ptr, api_key);
-		url.ptr[strlen(USER_URL) + strlen(api_key)] = '\0';
-		url.len = strlen(USER_URL) + strlen(api_key) + 1;
-		printf("%s\n", url.ptr);
-		curl_easy_setopt(curl, CURLOPT_URL, url.ptr);
+		struct string *url = construct_user_url(api_key);
+		printf("%s\n", url->ptr);
+		curl_easy_setopt(curl, CURLOPT_URL, url->ptr);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, aggregate_data_to_string);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, s);
 		res = curl_easy_perform(curl);

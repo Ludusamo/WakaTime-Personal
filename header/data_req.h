@@ -7,8 +7,10 @@
 #include <curl/curl.h>
 #include "str.h"
 
-#define USER_URL "https://wakatime.com/api/v1/users/current?api_key="
+#define USER_URL "https://wakatime.com/api/v1/users/current"
+#define SUMMARIES_URL "https://wakatime.com/api/v1/users/current/summaries?"
 
+struct string* construct_user_url(char *api_key);
 struct string* get_user(char *api_key);
 size_t aggregate_data_to_string(char *ptr, size_t size, size_t nmemb, struct string *userdata);
 
