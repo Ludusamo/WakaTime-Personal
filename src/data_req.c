@@ -8,12 +8,15 @@ struct string* get_user(char *api_key) {
 	struct string *s = malloc(sizeof(struct string));
 	init_string(s);
 	if (curl) {
-		char url[strlen(USER_URL) + strlen(api_key) + 1];
-		strcpy(url, USER_URL);
-		strcat(url, api_key);
-		url[strlen(USER_URL) + strlen(api_key)] = '\0';
-		printf("%s\n", url);
-		curl_easy_setopt(curl, CURLOPT_URL, url);
+		struct string url;
+		init_string(&url);
+		url.ptr = malloc(strlen(USER_URL) + strlen(api_key) + 1);
+		strcpy(url.ptr, USER_URL);
+		strcat(url.ptr, api_key);
+		url.ptr[strlen(USER_URL) + strlen(api_key)] = '\0';
+		url.len = strlen(USER_URL) + strlen(api_key) + 1;
+		printf("%s\n", url.ptr);
+		curl_easy_setopt(curl, CURLOPT_URL, url.ptr);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, aggregate_data_to_string);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, s);
 		res = curl_easy_perform(curl);
