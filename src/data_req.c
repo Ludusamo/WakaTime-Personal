@@ -11,25 +11,7 @@ struct string* construct_user_url(struct string *api_key) {
 }
 
 struct string* get_user(struct string *api_key) {
-	CURL *curl;
-	CURLcode res;
-	curl = curl_easy_init();
-
-	struct string *s = malloc(sizeof(struct string));
-	init_string(s);
-	if (curl) {
-		struct string *url = construct_user_url(api_key);
-		curl_easy_setopt(curl, CURLOPT_URL, url->ptr);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, aggregate_data_to_string);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, s);
-		res = curl_easy_perform(curl);
-		if (res != CURLE_OK)
-			fprintf(stderr, "curl_easy_perform() failed: %s\n",
-					curl_easy_strerror(res));
-
-		curl_easy_cleanup(curl);
-	}
-	return s;
+	return request_data(construct_user_url(api_key));
 }
 
 struct string* construct_date_string(int year, int month, int day) {
@@ -56,6 +38,10 @@ struct string* construct_summaries_url(struct string *date_string, struct string
 }
 
 struct string* get_summaries(struct string *date_string, struct string *api_key) {
+	return request_data(construct_summaries_url(date_string, api_key));
+}
+
+struct string* request_data(struct string *url) {
 	CURL *curl;
 	CURLcode res;
 	curl = curl_easy_init();
@@ -63,7 +49,6 @@ struct string* get_summaries(struct string *date_string, struct string *api_key)
 	struct string *s = malloc(sizeof(struct string));
 	init_string(s);
 	if (curl) {
-		struct string *url = construct_summaries_url(date_string, api_key);
 		curl_easy_setopt(curl, CURLOPT_URL, url->ptr);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, aggregate_data_to_string);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, s);
