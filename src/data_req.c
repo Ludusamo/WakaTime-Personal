@@ -5,10 +5,7 @@ struct string* construct_user_url(char *api_key) {
 	init_string(url);
 	size_t new_len = strlen(USER_URL) + strlen("?api_key=") + strlen(api_key) + 1;
 	url->ptr = realloc(url->ptr, new_len);
-	strcpy(url->ptr, USER_URL);
-	strcat(url->ptr, "?api_key=");
-	strcat(url->ptr, api_key);
-	strcat(url->ptr, "\0");
+	sprintf(url->ptr, "%s?api_key=%s", USER_URL, api_key);
 	url->len = new_len;
 	return url;
 }
@@ -47,6 +44,16 @@ struct string* construct_date_string(int year, int month, int day) {
 	date->len = 10;
 	sprintf(date->ptr, "%04d-%02d-%02d", year, month, day);
 	return date;
+}
+
+struct string* construct_summaries_url(char *date_string, char *api_key) {
+	struct string *url = malloc(sizeof(struct string));
+	init_string(url);
+	size_t new_len = strlen(SUMMARIES_URL) + strlen("?start=&end=&api_key=") + strlen(date_string) + strlen(api_key);
+	url->ptr = realloc(url->ptr, new_len);
+	sprintf(url->ptr, "%s?start=%s&end=%s&api_key=%s", SUMMARIES_URL, date_string, date_string, api_key);
+	url->len = new_len;
+	return url;
 }
 
 size_t aggregate_data_to_string(char *ptr, size_t size, size_t nmemb, struct string *s) {

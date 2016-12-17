@@ -5,6 +5,7 @@
 
 int main() {
 	printf("%s\n", construct_date_string(2016, 5, 22)->ptr);
+	printf("%s\n", construct_summaries_url(construct_date_string(2016,5,22)->ptr, "dasfjkl")->ptr);
 	FILE *api_key_file = fopen("bin/api_key", "r");
 	if (api_key_file) {
 		char api_key[37];
