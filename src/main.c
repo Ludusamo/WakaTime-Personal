@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 int main() {
+	printf("%s\n", construct_date_string(2016, 5, 22)->ptr);
 	FILE *api_key_file = fopen("bin/api_key", "r");
 	if (api_key_file) {
 		char api_key[37];
