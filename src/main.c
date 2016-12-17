@@ -5,13 +5,14 @@
 
 int main() {
 	printf("%s\n", construct_date_string(2016, 5, 22)->ptr);
-	printf("%s\n", construct_summaries_url(construct_date_string(2016,5,22)->ptr, "dasfjkl")->ptr);
 	FILE *api_key_file = fopen("bin/api_key", "r");
 	if (api_key_file) {
-		char api_key[37];
-		fscanf(api_key_file, "%s", api_key);
-		api_key[36] = '\0';
-		printf("%s\n", api_key);
+		struct string *api_key = malloc(sizeof(struct string));
+		api_key->ptr = malloc(37);
+		api_key->len = 37;
+		fscanf(api_key_file, "%s", api_key->ptr);
+		printf("%s\n", construct_summaries_url(construct_date_string(2016,5,22), api_key)->ptr);
+		printf("%s\n", api_key->ptr);
 		
 		curl_global_init(CURL_GLOBAL_DEFAULT);
 		printf("%s\n", get_user(api_key)->ptr);

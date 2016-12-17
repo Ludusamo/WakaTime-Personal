@@ -1,16 +1,16 @@
 #include <data_req.h>
 
-struct string* construct_user_url(char *api_key) {
+struct string* construct_user_url(struct string *api_key) {
 	struct string *url = malloc(sizeof(struct string));
 	init_string(url);
-	size_t new_len = strlen(USER_URL) + strlen("?api_key=") + strlen(api_key) + 1;
+	size_t new_len = strlen(USER_URL) + strlen("?api_key=") + api_key->len + 1;
 	url->ptr = realloc(url->ptr, new_len);
-	sprintf(url->ptr, "%s?api_key=%s", USER_URL, api_key);
+	sprintf(url->ptr, "%s?api_key=%s", USER_URL, api_key->ptr);
 	url->len = new_len;
 	return url;
 }
 
-struct string* get_user(char *api_key) {
+struct string* get_user(struct string *api_key) {
 	CURL *curl;
 	CURLcode res;
 	curl = curl_easy_init();
@@ -46,12 +46,12 @@ struct string* construct_date_string(int year, int month, int day) {
 	return date;
 }
 
-struct string* construct_summaries_url(char *date_string, char *api_key) {
+struct string* construct_summaries_url(struct string *date_string, struct string *api_key) {
 	struct string *url = malloc(sizeof(struct string));
 	init_string(url);
-	size_t new_len = strlen(SUMMARIES_URL) + strlen("?start=&end=&api_key=") + strlen(date_string) + strlen(api_key);
+	size_t new_len = strlen(SUMMARIES_URL) + strlen("?start=&end=&api_key=") + 2 * date_string->len + api_key->len;
 	url->ptr = realloc(url->ptr, new_len);
-	sprintf(url->ptr, "%s?start=%s&end=%s&api_key=%s", SUMMARIES_URL, date_string, date_string, api_key);
+	sprintf(url->ptr, "%s?start=%s&end=%s&api_key=%s", SUMMARIES_URL, date_string->ptr, date_string->ptr, api_key->ptr);
 	url->len = new_len;
 	return url;
 }
