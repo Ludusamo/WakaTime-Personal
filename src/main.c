@@ -3,6 +3,7 @@
 #include <data_req.h>
 #include <unistd.h>
 #include <jansson.h>
+#include <parse.h>
 
 int validate_api_key(struct string *api_key) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -39,7 +40,11 @@ int main() {
 		printf("%s\n", api_key->ptr);
 		
 		curl_global_init(CURL_GLOBAL_DEFAULT);
-		printf("%s\n", get_summaries(construct_date_string(2016, 12, 14), api_key)->ptr);
+		struct string *summaries = get_summaries(construct_date_string(2016, 12, 14), api_key);
+        json_error_t error;
+        json_t *root = json_loads(summaries->ptr, 0, &error);
+        json_t *parsed = parse_single_day(root);
+        printf("%s\n", json_dumps(parsed, JSON_ENCODE_ANY));
 		curl_global_cleanup(); 
 
         if (validate_api_key(api_key)) {
