@@ -10,5 +10,6 @@ struct string {
 };
 
 void init_string(struct string *s);
+void deinit_string(struct string *s);
 
 #endif // STRING_H

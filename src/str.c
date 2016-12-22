@@ -10,3 +10,8 @@ void init_string(struct string *s) {
 	s->ptr[0] = '\0';
 }
 
+void deinit_string(struct string *s) {
+    s->len = 0;
+    free(s->ptr);
+    free(s);
+}
