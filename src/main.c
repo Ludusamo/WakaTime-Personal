@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <jansson.h>
 #include <parse.h>
+#include "filesystem.h"
 
 int validate_api_key(struct string *api_key) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -31,6 +32,8 @@ int validate_api_key(struct string *api_key) {
 }
 
 int main() { 
+    check_or_create_dir(string_from_char_arr("data/"));
+
 	FILE *api_key_file = fopen("bin/api_key", "r");
 	if (api_key_file) {
 		struct string *api_key = malloc(sizeof(struct string));
