@@ -49,12 +49,8 @@ void get_data_on(int year, int month, int day) {
         json_error_t error;
         json_t *root = json_loads(summaries->ptr, 0, &error);
         json_t *parsed = parse_single_day(root);
-        printf("%s\n", json_dumps(parsed, JSON_ENCODE_ANY));
         struct string *path = string_from_char_arr("data/");
-        size_t new_len = path->len + date->len;
-        path->len = new_len;
-        path->ptr = realloc(path->ptr, new_len);
-        sprintf(path->ptr, "%s%s", path->ptr, date->ptr);
+        string_concat(path, date);
         json_dump_file(parsed, path->ptr, JSON_ENCODE_ANY);
         json_decref(root);
         json_decref(parsed);

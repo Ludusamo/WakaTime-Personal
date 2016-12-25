@@ -18,6 +18,12 @@ struct string *string_from_char_arr(char *str) {
     return s;
 }
 
+void string_concat(struct string *s1, struct string *s2) {
+    size_t new_len = s1->len + s2->len;
+    s1->len = new_len;
+    sprintf(s1->ptr, "%s%s", s1->ptr, s2->ptr);
+}
+
 void deinit_string(struct string *s) {
     s->len = 0;
     free(s->ptr);
