@@ -5,6 +5,7 @@
 #include <jansson.h>
 #include <parse.h>
 #include "filesystem.h"
+#include "config.h"
 
 int validate_api_key(struct string *api_key) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -65,12 +66,11 @@ void get_data_on(int year, int month, int day) {
 }
 
 void set_api_key(char *api_key) {
-    FILE *api_file = fopen("bin/api_key", "w");
-    if (!api_file) {
-        fprintf(stderr, "error: cannot open api key file\n");
-        exit(EXIT_FAILURE);
-    }
-    fprintf(api_file, "%s", api_key);
+    struct string *key = string_from_char_arr("api_key");
+    struct string *val = string_from_char_arr(api_key);
+    config_update_string_value(key, val);
+    deinit_string(key);
+    deinit_string(val);
 }
 
 int main(int argc, char **args) { 

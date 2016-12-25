@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "str.h"
+#include "config.h"
 #include <stdio.h>
 
 void check_or_create_dir(struct string *path);
