@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <jansson.h>
 #include <parse.h>
+#include "filesystem.h"
 
 int validate_api_key(struct string *api_key) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -30,31 +31,71 @@ int validate_api_key(struct string *api_key) {
     return 1;
 }
 
-int main() { 
-	FILE *api_key_file = fopen("bin/api_key", "r");
-	if (api_key_file) {
-		struct string *api_key = malloc(sizeof(struct string));
-		api_key->ptr = malloc(37);
-		api_key->len = 37;
-		fscanf(api_key_file, "%s", api_key->ptr);
-		printf("%s\n", api_key->ptr);
-		
-		curl_global_init(CURL_GLOBAL_DEFAULT);
-		struct string *summaries = get_summaries(construct_date_string(2016, 12, 14), api_key);
+void check_data_folder() {
+    struct string *data_path = string_from_char_arr("data");
+    check_or_create_dir(data_path);
+    deinit_string(data_path);
+}
+
+void get_data_on(int year, int month, int day) {
+    check_data_folder();
+    struct string *api_key = get_api_key();
+    if (validate_api_key(api_key)) {
+        curl_global_init(CURL_GLOBAL_DEFAULT);
+        struct string *date = construct_date_string(year, month, day);
+        struct string *summaries = get_summaries(date, api_key);
+        curl_global_cleanup();   
+        deinit_string(api_key);
+
         json_error_t error;
         json_t *root = json_loads(summaries->ptr, 0, &error);
         json_t *parsed = parse_single_day(root);
-        printf("%s\n", json_dumps(parsed, JSON_ENCODE_ANY));
-		curl_global_cleanup(); 
 
-        if (validate_api_key(api_key)) {
-            printf("Valid api key\n");
+        struct string *path = string_from_char_arr("data/");
+        string_concat(path, date);
+        json_dump_file(parsed, path->ptr, JSON_ENCODE_ANY);
+        json_decref(root);
+        json_decref(parsed);
+        deinit_string(date);
+        deinit_string(path);
+    } else {
+        fprintf(stderr, "error: invalid api key\nCheck your api key file\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void set_api_key(char *api_key) {
+    FILE *api_file = fopen("bin/api_key", "w");
+    if (!api_file) {
+        fprintf(stderr, "error: cannot open api key file\n");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(api_file, "%s", api_key);
+}
+
+int main(int argc, char **args) { 
+    if (argc == 1) {
+        fprintf(stderr, "error: no command issued, exiting program\n");
+        return 1;
+    } else { 
+        if (strcmp(args[1], "get") == 0) {
+            if (argc == 5) {
+                get_data_on(atoi(args[2]), atoi(args[3]), atoi(args[4]));
+            } else {
+                fprintf(stderr, "error: insufficient parameters for get data\n");
+                return 1;
+            }
+        } else if (strcmp(args[1], "set-api-key") == 0) {
+            if (argc == 3) {
+                set_api_key(args[2]);
+            } else {
+                fprintf(stderr, "error: must supply api key in the following format\n./wakatime-personal set-api-key <api-key>\n");
+                return 1;
+            }
         } else {
+            fprintf(stderr, "error: invalid command issued %s\n", args[0]);
             return 1;
         }
-	} else {
-		printf("No api file\n");	
-		return 1;
-	}
+    } 
 	return 0;
 }

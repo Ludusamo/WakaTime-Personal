@@ -4,14 +4,14 @@ json_t *parse_single_day(json_t *root) {
     if (!json_is_object(root)) {
         fprintf(stderr, "error: invalid root object\n");
         json_decref(root);
-        return NULL;
+        exit(EXIT_FAILURE);
     }
     json_t *data = json_object_get(root, "data");
     if (!json_is_array(data)) {
         fprintf(stderr, "error: data is not an array\n");
         json_decref(root);
         json_decref(data);
-        return NULL;
+        exit(EXIT_FAILURE);
     }
     json_t *day = json_array_get(data, 0);
     if (!json_is_object(day)) {
@@ -19,6 +19,7 @@ json_t *parse_single_day(json_t *root) {
         json_decref(root);
         json_decref(data);
         json_decref(day);
+        exit(EXIT_FAILURE);
     }
     
     json_t *editors = json_object_get(day, "editors");
