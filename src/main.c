@@ -46,9 +46,11 @@ void get_data_on(int year, int month, int day) {
         struct string *summaries = get_summaries(date, api_key);
         curl_global_cleanup();   
         deinit_string(api_key);
+
         json_error_t error;
         json_t *root = json_loads(summaries->ptr, 0, &error);
         json_t *parsed = parse_single_day(root);
+
         struct string *path = string_from_char_arr("data/");
         string_concat(path, date);
         json_dump_file(parsed, path->ptr, JSON_ENCODE_ANY);
@@ -62,6 +64,15 @@ void get_data_on(int year, int month, int day) {
     }
 }
 
+void set_api_key(char *api_key) {
+    FILE *api_file = fopen("bin/api_key", "w");
+    if (!api_file) {
+        fprintf(stderr, "error: cannot open api key file\n");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(api_file, "%s", api_key);
+}
+
 int main(int argc, char **args) { 
     if (argc == 1) {
         fprintf(stderr, "error: no command issued, exiting program\n");
@@ -72,6 +83,13 @@ int main(int argc, char **args) {
                 get_data_on(atoi(args[2]), atoi(args[3]), atoi(args[4]));
             } else {
                 fprintf(stderr, "error: insufficient parameters for get data\n");
+                return 1;
+            }
+        } else if (strcmp(args[1], "set-api-key") == 0) {
+            if (argc == 3) {
+                set_api_key(args[2]);
+            } else {
+                fprintf(stderr, "error: must supply api key in the following format\n./wakatime-personal set-api-key <api-key>\n");
                 return 1;
             }
         } else {
