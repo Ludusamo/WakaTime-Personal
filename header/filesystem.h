@@ -10,5 +10,6 @@
 
 void check_or_create_dir(struct string *path);
 struct string *get_api_key();
+struct string *construct_data_path();
 
 #endif // FILESYSTEM_H

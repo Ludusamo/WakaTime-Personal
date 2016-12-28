@@ -27,3 +27,20 @@ struct string *config_get_string_value(struct string *key) {
     json_decref(val);
     return string_val;
 }
+
+void set_api_key(char *api_key) {
+    struct string *key = string_from_char_arr("api_key");
+    struct string *val = string_from_char_arr(api_key);
+    config_update_string_value(key, val);
+    deinit_string(key);
+    deinit_string(val);
+}
+
+void set_data_path(char *data_path) {
+	struct string *key = string_from_char_arr("data_path");
+	struct string *val = string_from_char_arr(data_path);
+	config_update_string_value(key, val);
+	deinit_string(key);
+	deinit_string(val);
+}
+

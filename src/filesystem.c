@@ -14,3 +14,10 @@ struct string *get_api_key() {
     deinit_string(key);
     return api_key;
 }
+
+struct string *construct_data_path() {
+	struct string *data_path_key = string_from_char_arr("data_path");
+	struct string *data_path = config_get_string_value(data_path_key);
+	deinit_string(data_path_key);
+	return data_path;
+}
