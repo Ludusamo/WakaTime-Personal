@@ -9,16 +9,15 @@ void check_or_create_dir(struct string *path) {
 }
 
 struct string *get_api_key() {
-    FILE *api_key_file = fopen("bin/api_key", "r");
-	if (api_key_file) {
-		struct string *api_key = malloc(sizeof(struct string));
-		api_key->ptr = malloc(37);
-		api_key->len = 37;
-		fscanf(api_key_file, "%s", api_key->ptr);
-        return api_key;
-    } else {
-		fprintf(stderr, "error: no api key file\nRerun application setup");	
-        exit(EXIT_FAILURE);
-    }
-    return NULL;
+    struct string *key = string_from_char_arr("api_key");
+    struct string *api_key = config_get_string_value(key);
+    deinit_string(key);
+    return api_key;
+}
+
+struct string *construct_data_path() {
+	struct string *data_path_key = string_from_char_arr("data_path");
+	struct string *data_path = config_get_string_value(data_path_key);
+	deinit_string(data_path_key);
+	return data_path;
 }

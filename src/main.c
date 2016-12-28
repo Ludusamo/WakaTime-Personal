@@ -1,10 +1,11 @@
 #include <stdio.h>
-#include <curl/curl.h>
+#include <curl/curl.h> 
 #include <data_req.h>
 #include <unistd.h>
 #include <jansson.h>
 #include <parse.h>
 #include "filesystem.h"
+#include "config.h"
 
 int validate_api_key(struct string *api_key) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -32,7 +33,7 @@ int validate_api_key(struct string *api_key) {
 }
 
 void check_data_folder() {
-    struct string *data_path = string_from_char_arr("data");
+    struct string *data_path = construct_data_path();
     check_or_create_dir(data_path);
     deinit_string(data_path);
 }
@@ -51,7 +52,7 @@ void get_data_on(int year, int month, int day) {
         json_t *root = json_loads(summaries->ptr, 0, &error);
         json_t *parsed = parse_single_day(root);
 
-        struct string *path = string_from_char_arr("data/");
+        struct string *path = construct_data_path();
         string_concat(path, date);
         json_dump_file(parsed, path->ptr, JSON_ENCODE_ANY);
         json_decref(root);
@@ -62,15 +63,6 @@ void get_data_on(int year, int month, int day) {
         fprintf(stderr, "error: invalid api key\nCheck your api key file\n");
         exit(EXIT_FAILURE);
     }
-}
-
-void set_api_key(char *api_key) {
-    FILE *api_file = fopen("bin/api_key", "w");
-    if (!api_file) {
-        fprintf(stderr, "error: cannot open api key file\n");
-        exit(EXIT_FAILURE);
-    }
-    fprintf(api_file, "%s", api_key);
 }
 
 int main(int argc, char **args) { 
@@ -90,6 +82,13 @@ int main(int argc, char **args) {
                 set_api_key(args[2]);
             } else {
                 fprintf(stderr, "error: must supply api key in the following format\n./wakatime-personal set-api-key <api-key>\n");
+                return 1;
+            }
+        } else if (strcmp(args[1], "set-data-path") == 0) {
+            if (argc == 3) {
+                set_data_path(args[2]);
+            } else {
+                fprintf(stderr, "error: must supply api key in the following format\n./wakatime-personal set-data-path <data-path>\n");
                 return 1;
             }
         } else {
